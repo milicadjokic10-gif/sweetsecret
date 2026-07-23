@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { background:#FDF1F7; color:#3A2A30; font-family:'Jost',sans-serif; -webkit-font-smoothing:antialiased; }
+    a { color:#E5348C; text-decoration:none; }
+    a:hover { color:#C4237A; }
+    ::selection { background:#FBD6E8; }
+
+    /* (5) suptilna tekstura pozadine */
+    body { background-color:#FDF1F7; background-image:radial-gradient(#F3CFDF 1px, transparent 1.4px); background-size:26px 26px; }
+
+    /* (1) fade-in pri skrolovanju */
+    .reveal { opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity:1; transform:none; }
+    @media (prefers-reduced-motion:reduce){ .reveal{opacity:1 !important;transform:none !important;} }
+
+    /* (2) hover zoom slika */
+    .zoomwrap { overflow:hidden; }
+    .zoomwrap img, .zoomwrap image-slot { transition:transform .5s ease; will-change:transform; }
+    .zoomwrap:hover img, .zoomwrap:hover image-slot { transform:scale(1.06); }
+  
+    body { overflow-x:hidden; }
+    .nav-toggle { position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; }
+    .nav-burger { display:none; flex-direction:column; justify-content:center; align-items:center; gap:5px; width:44px; height:44px; cursor:pointer; }
+    .nav-burger span { width:24px; height:2px; background:#3A2A30; border-radius:2px; transition:.25s; }
+    @media (max-width:820px){
+      nav { position:relative; flex-wrap:wrap; }
+      .nav-burger { display:flex; }
+      .nav-links { position:absolute; top:100%; left:0; right:0; flex-direction:column !important; align-items:stretch !important; gap:0 !important; background:#FDF1F7; border-top:1px solid #F4D5E3; box-shadow:0 16px 30px -16px rgba(138,20,60,.3); max-height:0; overflow:hidden; transition:max-height .3s ease; z-index:60; }
+      .nav-toggle:checked ~ .nav-links { max-height:440px; }
+      .nav-links a { padding:15px 40px !important; border-bottom:1px solid #F4D5E3; border-radius:0 !important; background:transparent !important; color:#3A2A30 !important; }
+      .nav-links a:last-child{ margin:12px 40px; padding:13px 20px !important; background:#E5348C !important; color:#fff !important; border-radius:100px !important; border-bottom:0 !important; text-align:center; }
+      .nav-toggle:checked ~ .nav-burger span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+      .nav-toggle:checked ~ .nav-burger span:nth-child(2){ opacity:0; }
+      .nav-toggle:checked ~ .nav-burger span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+      [style*="1.05fr"],[style*="1.1fr"],[style*="0.85fr"],[style*="1.2fr"],[style*="1fr auto"]{ grid-template-columns:1fr !important; }
+      [style*="1.4fr"]{ grid-template-columns:1fr 1fr !important; }
+      [style*="repeat(4"]{ grid-template-columns:repeat(2,1fr) !important; }
+      .posluz-box{ padding:28px 22px !important; gap:20px !important; }
+      .posluz-box h2{ font-size:26px !important; }
+      .posluz-box a{ justify-self:start; padding:12px 24px !important; }
+    }
+    @media (max-width:560px){
+      [style*="repeat(3"],[style*="15px 52px"],[style*="14px 52px"],[style*="1.4fr"]{ grid-template-columns:1fr !important; }
+      [style*="76px"]{ font-size:44px !important; }
+      [style*="letter-spacing: 0.1em"][style*="white-space: nowrap"]{ display:none !important; }
+      [style*="font-size: 34px"][style*="white-space: nowrap"]{ white-space:normal !important; }
+      [style*="62px"]{ font-size:38px !important; }
+    }
+  </style>
+  <script src="enhance.js"></script>
+</helmet>
+
+<div style="min-height:100vh;background:#FDF1F7;">
+
+  <header style="position:sticky;top:0;z-index:50;background:rgba(253,241,247,0.88);backdrop-filter:blur(10px);border-bottom:1px solid #F4D5E3;">
+    <nav style="max-width:1200px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;">
+      <a href="index.html" style="display:flex;align-items:center;gap:14px;line-height:1;">
+        <img src="images/logo.png" alt="Sweet Secret logo" style="width:74px;height:74px;flex:none;border-radius:50%;object-fit:contain;background:#fff;">
+        <span style="display:flex;flex-direction:column;">
+          <span style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:26px;color:#3A2A30;letter-spacing:0.02em;">Sweet Secret</span>
+          <span style="font-family:'Jost',sans-serif;font-weight:400;font-size:10px;letter-spacing:0.32em;text-transform:uppercase;color:#D06699;margin-top:3px;">Poslastičara · Niš</span>
+        </span>
+      </a>
+      <input type="checkbox" id="navtgl" class="nav-toggle" aria-label="Meni">
+      <label for="navtgl" class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></label>
+      <div class="nav-links" style="display:flex;align-items:center;gap:36px;">
+        <a href="index.html" style="font-size:14px;letter-spacing:0.06em;color:#8A7278;">Početna</a>
+        <a href="meni.html" style="font-size:14px;letter-spacing:0.06em;color:#3A2A30;font-weight:500;">Meni</a>
+        <a href="torte.html" style="font-size:14px;letter-spacing:0.06em;color:#8A7278;">Torte</a>
+        <a href="kolaci.html" style="font-size:14px;letter-spacing:0.06em;color:#8A7278;">Kolači</a>
+        <a href="kontakt.html" style="font-size:13px;letter-spacing:0.04em;color:#fff;background:#E5348C;padding:10px 20px;border-radius:100px;font-weight:500;" style-hover="background:#C4237A;">Poručite tortu</a>
+      </div>
+    </nav>
+  </header>
+
+  <!-- PAGE HEADER -->
+  <section style="max-width:1200px;margin:0 auto;padding:70px 40px 44px;text-align:center;">
+    <span style="font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:#D06699;">Naša ponuda</span>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:62px;line-height:1.05;color:#3A2A30;margin-top:14px;">Meni</h1>
+    <p style="margin:18px auto 0;max-width:520px;font-size:16px;line-height:1.7;color:#7A6068;font-weight:300;">Sve što nudimo — kolači, torte, kafa i osveženja — pripremljeno je ručno i sa ljubavlju, za uživanje kod nas ili po vašoj narudžbini.</p>
+  </section>
+
+  <!-- AMBIJENT -->
+  <section style="max-width:1000px;margin:0 auto;padding:14px 40px 44px;">
+    <div style="background:#FBE3EF;border:1px solid #F4D5E3;border-radius:24px;padding:44px;display:grid;grid-template-columns:1.2fr 0.8fr;gap:36px;align-items:center;">
+      <div>
+        <span style="font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:#D06699;">Posetite nas</span>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:36px;line-height:1.12;color:#3A2A30;margin-top:12px;">Svratite i uživajte u našem ambijentu</h2>
+        <p style="margin-top:14px;max-width:460px;font-size:15px;line-height:1.75;color:#7A6068;font-weight:300;">Osim narudžbina, vrata su vam uvek otvorena — uz šoljicu kafe, sveže kolače i osunčanu baštu, kod nas svaki trenutak postaje mali predah. Dođite, opustite se i prepustite se slatkim tajnama.</p>
+        <a href="kontakt.html" style="display:inline-block;margin-top:24px;font-size:14px;letter-spacing:0.04em;color:#fff;background:#E5348C;padding:13px 28px;border-radius:100px;font-weight:500;" style-hover="background:#C4237A;">Gde se nalazimo →</a>
+      </div>
+      <div data-simple-slider style="aspect-ratio:4/3;border-radius:16px;overflow:hidden;position:relative;">
+        <div data-simple-strip style="display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;">
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><img src="images/basta.jpg" alt="Letnja bašta Sweet Secret" style="width:100%;height:100%;object-fit:cover;object-position:center bottom;display:block;"></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><img src="images/amb-a.jpg" alt="Enterijer Sweet Secret" style="width:100%;height:100%;object-fit:cover;object-position:center bottom;display:block;"></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><img src="images/amb-b.jpg" alt="Bašta sa pogledom" style="width:100%;height:100%;object-fit:cover;object-position:center;display:block;"></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><img src="images/amb-c.jpg" alt="Sweet Secret café poslastičara" style="width:100%;height:100%;object-fit:cover;object-position:center bottom;display:block;"></div>
+        </div>
+        <button data-simple-prev aria-label="Prethodna" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);width:40px;height:40px;border:none;border-radius:100px;background:rgba(255,255,255,0.85);color:#8A4E5F;font-size:20px;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(58,20,36,0.2);">‹</button>
+        <button data-simple-next aria-label="Sledeća" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);width:40px;height:40px;border:none;border-radius:100px;background:rgba(255,255,255,0.85);color:#8A4E5F;font-size:20px;line-height:1;cursor:pointer;box-shadow:0 4px 12px rgba(58,20,36,0.2);">›</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- MENU -->
+  <section style="max-width:900px;margin:0 auto;padding:20px 40px 80px;display:flex;flex-direction:column;gap:64px;">
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:14px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Kolači</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">cena po parčetu</span>
+      </div>
+      <div style="display:flex;gap:18px;margin-bottom:26px;">
+        <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#7A6068;"><span style="width:9px;height:9px;border-radius:50%;background:#8AB79A;"></span>vegan</span>
+        <span style="display:inline-flex;align-items:center;gap:7px;font-size:12px;color:#7A6068;"><span style="width:9px;height:9px;border-radius:50%;background:#D6A96A;"></span>gluten free</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Secret Orange</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">370 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Rafaelo</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">370 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Secret Rosher <span style="margin-left:4px;font-size:11px;color:#5E8A6E;">● vegan</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">330 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Voćni mus <span style="margin-left:4px;font-size:11px;color:#5E8A6E;">● vegan</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">330 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Ferrero</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">410 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Biscoff čizkejk</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">370 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Profiterole</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Tiramisu</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Čokoladni mus <span style="margin-left:4px;font-size:11px;color:#B08145;">● gluten free</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Baklava</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">270 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Tulumba</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">270 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Šampita</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">270 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Krempita</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">270 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Papucaki</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">280 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Čizkejk</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">320 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Nugat kolač</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Trileće</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">300 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Žito sa šlagom</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">230 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Milfej</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">320 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Ruby malina</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">370 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Dubai kolač</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">410 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Torte na parče</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">cena po parčetu</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Secret</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">330 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Napoleon</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">330 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Čoko-oranž</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">330 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Kapri</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">330 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Reforma</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">330 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Torte šnit & dekorisane</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">po narudžbini</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;align-items:baseline;gap:14px;">
+          <div style="flex:1;"><span style="font-size:18px;color:#3A2A30;font-weight:500;">Torta šnit (klasik ukusi)</span></div>
+          <span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#C4237A;font-weight:500;">2.000 din / kg</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;">
+          <div style="flex:1;"><span style="font-size:18px;color:#3A2A30;font-weight:500;">Dekorisana torta po narudžbini</span><p style="font-size:13px;color:#9A828A;font-weight:300;margin-top:2px;">Dizajn po vašoj želji — rođendani, svadbe, krštenja</p></div>
+          <span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#C4237A;font-weight:500;">2.500 din / kg</span>
+        </div>
+      </div>
+      <p style="margin-top:22px;font-size:14px;line-height:1.7;color:#9A828A;font-weight:300;font-style:italic;font-family:'Cormorant Garamond',serif;">* Za dekorisane torte cena zavisi od dizajna, ukusa i broja gostiju. <a href="kontakt.html">Zatražite ponudu →</a></p>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Kafa & napici</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">u našoj bašti</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Domaća</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">180 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Espresso <span style="font-size:12px;color:#9A828A;">(sa i bez mleka)</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">210 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Macchiato</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">220 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Cappuccino</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">240 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Americano</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">230 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Latte</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">250 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Latte sa ukusom</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">290 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Moca</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Ness</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Bailey's</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">350 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Irish</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">360 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Fredo espresso</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Fredo cappuccino</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">270 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Ice caffee</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Ice latte</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">290 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Voćne umetnosti</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">sveže pripremljeno</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;align-items:baseline;gap:14px;">
+          <div style="flex:1;"><span style="font-size:18px;color:#3A2A30;font-weight:500;">Voćna salata</span><p style="font-size:13px;color:#9A828A;font-weight:300;margin-top:2px;">Sezonsko sveže voće</p></div>
+          <span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#C4237A;font-weight:500;">370 din</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;">
+          <div style="flex:1;"><span style="font-size:18px;color:#3A2A30;font-weight:500;">Banana split</span><p style="font-size:13px;color:#9A828A;font-weight:300;margin-top:2px;">Banana, sladoled i šlag</p></div>
+          <span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#C4237A;font-weight:500;">440 din</span>
+        </div>
+        <div style="display:flex;align-items:baseline;gap:14px;">
+          <div style="flex:1;"><span style="font-size:18px;color:#3A2A30;font-weight:500;">Kup „MIMI“</span><p style="font-size:13px;color:#9A828A;font-weight:300;margin-top:2px;">Naša posebna kombinacija voća i sladoleda</p></div>
+          <span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#C4237A;font-weight:500;">490 din</span>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Sladoled</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">po kugli</span>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:20px;">
+        <div style="display:flex;align-items:baseline;gap:14px;">
+          <div style="flex:1;"><span style="font-size:18px;color:#3A2A30;font-weight:500;">Sladoled</span><p style="font-size:13px;color:#9A828A;font-weight:300;margin-top:2px;">Raznovrsni ukusi iz naše vitrine — po kugli</p></div>
+          <span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:22px;color:#C4237A;font-weight:500;">120 din</span>
+        </div>
+      </div>
+
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Sokovi</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">osveženje</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Coca-Cola <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Coca-Cola Zero <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Schweppes <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Sprite <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">250 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Fanta <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">250 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Cockta <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Next sokovi <span style="font-size:12px;color:#9A828A;">0.2</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">250 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Cedevita</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">240 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Fuze Tea <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Ultra <span style="font-size:12px;color:#9A828A;">0.25</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Topli i hladni napici</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">za svako doba</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Topla čokolada</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Dolceza čaj</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">280 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Domaći čaj</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">240 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Milk shake sa sladoledom</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">350 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Frape sa svežim voćem</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">370 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Plazma shake</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">350 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Ceđeni sokovi</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+        <span style="font-size:12px;letter-spacing:0.1em;color:#D06699;white-space:nowrap;">sveže ceđeno</span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Limunada</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">280 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Limunada sa ukusom</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">320 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Narandža</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">350 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Grejp</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">390 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Mix ceđeno</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">410 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Mineralna voda</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Römerquelle gazirana <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">240 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Römerquelle limunska trava <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Rosa gazirana <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">230 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Rosa negazirana <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">240 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Pivo</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Stella Artois <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">420 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Jelen <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">300 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Jelen <span style="font-size:12px;color:#9A828A;">0.5</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">280 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Staropramen <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">320 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Nikšićko <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Nikšićko <span style="font-size:12px;color:#9A828A;">0.5</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">280 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Bavaria <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">320 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Apsal <span style="font-size:12px;color:#9A828A;">0.33</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">320 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Žestoka pića</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Martini <span style="font-size:12px;color:#9A828A;">0.1</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">330 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Campari <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">280 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Jägermeister <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">280 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Gin <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">250 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Viljamovka <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Lincura <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Vinjak <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">240 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Pelinkovac <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Vodka <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">240 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Rum <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">210 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Finlandia <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Tequila <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Stomaklija <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Ouzo <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Vermut <span style="font-size:12px;color:#9A828A;">0.1</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Badel Prima <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">240 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Stock 84 <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">260 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Chivas Regal <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">410 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Jack Daniel's <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">410 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Johnnie Walker <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Ballantine's <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">310 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Jameson <span style="font-size:12px;color:#9A828A;">0.03</span></span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">350 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Alkoholni kokteli</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Long Island</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">530 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Tequila Sunrise</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">510 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Cuba Libre</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">510 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Blue Frog</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">590 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Mojito</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">550 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Sex on the Beach</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">530 din</span></div>
+      </div>
+    </div>
+
+    <div>
+      <div style="display:flex;align-items:baseline;gap:16px;margin-bottom:26px;">
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:34px;color:#C4237A;white-space:nowrap;">Bezalkoholni kokteli</h2>
+        <span style="flex:1;height:1px;background:#F3CFDF;"></span>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px 52px;">
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Mint Lemonade</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">390 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Sunrise</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">410 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Sensation</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">390 din</span></div>
+        <div style="display:flex;align-items:baseline;gap:12px;"><span style="font-size:17px;color:#3A2A30;font-weight:500;">Pink</span><span style="flex:1;border-bottom:1px dotted #EEBFD5;transform:translateY(-4px);"></span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;color:#C4237A;font-weight:500;white-space:nowrap;">390 din</span></div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- CTA -->
+  <section style="max-width:1200px;margin:0 auto;padding:20px 40px 80px;">
+    <div class="posluz-box" style="position:relative;overflow:hidden;border-radius:24px;padding:48px;display:grid;grid-template-columns:1fr auto;gap:36px;align-items:center;">
+      <img src="images/hero.jpg" alt="" aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0.55;">
+      <div aria-hidden="true" style="position:absolute;inset:0;background:linear-gradient(120deg,rgba(74,18,48,0.82),rgba(196,35,122,0.68));"></div>
+      <div style="position:relative;">
+        <span style="font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:#FFD1E4;">Tu smo za vas</span>
+        <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:40px;line-height:1.1;margin-top:10px;color:#fff;">Niste sigurni šta da izaberete?</h2>
+        <p style="margin-top:12px;max-width:440px;font-size:15px;line-height:1.7;color:#FBE3EF;font-weight:300;">Javite nam priliku i broj gostiju — rado ćemo vam pomoći da izaberete.</p>
+      </div>
+      <a href="kontakt.html" style="position:relative;display:inline-block;font-size:14px;letter-spacing:0.04em;color:#C4237A;background:#fff;padding:15px 30px;border-radius:100px;font-weight:600;white-space:nowrap;" style-hover="background:#FFD1E4;">Kontaktirajte nas</a>
+    </div>
+  </section>
+
+  <footer style="background:#FDF1F7;border-top:1px solid #F4D5E3;">
+    <div style="max-width:1200px;margin:0 auto;padding:56px 40px 40px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;">
+      <div>
+        <span style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:26px;color:#3A2A30;">Sweet Secret</span>
+        <p style="margin-top:12px;font-size:14px;line-height:1.7;color:#8A7278;font-weight:300;max-width:280px;">Poslastičara u Nišu. Ručno rađene torte i kolači po vašoj želji.</p>
+      </div>
+      <div>
+        <h4 style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#D06699;margin-bottom:16px;">Meni</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="meni.html" style="font-size:14px;color:#7A6068;">Ceo meni</a>
+          <a href="torte.html" style="font-size:14px;color:#7A6068;">Torte</a>
+          <a href="kolaci.html" style="font-size:14px;color:#7A6068;">Kolači</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#D06699;margin-bottom:16px;">Kontakt</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <span style="font-size:14px;color:#7A6068;">Park Svetog Save 10, Niš</span>
+          <a href="tel:+38166396500" style="font-size:14px;color:#7A6068;">+381 66 396 500</a>
+          <a href="https://www.instagram.com/sweet.secret.nis" target="_blank" rel="noopener noreferrer" style="font-size:14px;color:#7A6068;">@sweet.secret.nis</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:0 auto;padding:20px 40px;border-top:1px solid #F4D5E3;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:12px;color:#D06699;">© 2026 Sweet Secret · Niš</span>
+      <span style="font-size:12px;color:#D06699;">Ručno rađeno sa ljubavlju</span>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+</body>
+</html>

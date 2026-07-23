@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Jost:wght@300;400;500;600&family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  <style>
+    * { margin:0; padding:0; box-sizing:border-box; }
+    html { scroll-behavior:smooth; }
+    body { background:#FDF1F7; color:#3A2A30; font-family:'Jost',sans-serif; -webkit-font-smoothing:antialiased; }
+    a { color:#E5348C; text-decoration:none; }
+    a:hover { color:#C4237A; }
+    ::selection { background:#FBD6E8; }
+
+    /* (5) suptilna tekstura pozadine */
+    body { background-color:#FDF1F7; background-image:radial-gradient(#F3CFDF 1px, transparent 1.4px); background-size:26px 26px; }
+
+    /* (1) fade-in pri skrolovanju */
+    .reveal { opacity:0; transform:translateY(22px); transition:opacity .7s ease, transform .7s ease; }
+    .reveal.in { opacity:1; transform:none; }
+    @media (prefers-reduced-motion:reduce){ .reveal{opacity:1 !important;transform:none !important;} }
+
+    /* (2) hover zoom slika */
+    .zoomwrap { overflow:hidden; }
+    .zoomwrap img, .zoomwrap image-slot { transition:transform .5s ease; will-change:transform; }
+    .zoomwrap:hover img, .zoomwrap:hover image-slot { transform:scale(1.06); }
+    [data-strip]::-webkit-scrollbar { display:none; }
+    [data-strip] { scrollbar-width:none; }
+  
+    body { overflow-x:hidden; }
+    .nav-toggle { position:absolute; opacity:0; width:1px; height:1px; pointer-events:none; }
+    .nav-burger { display:none; flex-direction:column; justify-content:center; align-items:center; gap:5px; width:44px; height:44px; cursor:pointer; }
+    .nav-burger span { width:24px; height:2px; background:#3A2A30; border-radius:2px; transition:.25s; }
+    @media (max-width:820px){
+      nav { position:relative; flex-wrap:wrap; }
+      .nav-burger { display:flex; }
+      .nav-links { position:absolute; top:100%; left:0; right:0; flex-direction:column !important; align-items:stretch !important; gap:0 !important; background:#FDF1F7; border-top:1px solid #F4D5E3; box-shadow:0 16px 30px -16px rgba(138,20,60,.3); max-height:0; overflow:hidden; transition:max-height .3s ease; z-index:60; }
+      .nav-toggle:checked ~ .nav-links { max-height:440px; }
+      .nav-links a { padding:15px 40px !important; border-bottom:1px solid #F4D5E3; border-radius:0 !important; background:transparent !important; color:#3A2A30 !important; }
+      .nav-links a:last-child{ margin:12px 40px; padding:13px 20px !important; background:#E5348C !important; color:#fff !important; border-radius:100px !important; border-bottom:0 !important; text-align:center; }
+      .nav-toggle:checked ~ .nav-burger span:nth-child(1){ transform:translateY(7px) rotate(45deg); }
+      .nav-toggle:checked ~ .nav-burger span:nth-child(2){ opacity:0; }
+      .nav-toggle:checked ~ .nav-burger span:nth-child(3){ transform:translateY(-7px) rotate(-45deg); }
+      [style*="1.05fr"],[style*="1.1fr"],[style*="0.85fr"],[style*="1.2fr"],[style*="1fr auto"]{ grid-template-columns:1fr !important; }
+      [style*="1.4fr"]{ grid-template-columns:1fr 1fr !important; }
+      [style*="repeat(4"]{ grid-template-columns:repeat(2,1fr) !important; }
+    }
+    @media (max-width:560px){
+      [style*="repeat(3"],[style*="15px 52px"],[style*="1.4fr"]{ grid-template-columns:1fr !important; }
+      [style*="76px"]{ font-size:44px !important; }
+      [style*="62px"]{ font-size:38px !important; }
+    }
+  </style>
+  <script src="image-slot.js"></script>
+  <script src="enhance.js"></script>
+</helmet>
+
+<div style="min-height:100vh;background:#FDF1F7;">
+
+  <header style="position:sticky;top:0;z-index:50;background:rgba(253,241,247,0.88);backdrop-filter:blur(10px);border-bottom:1px solid #F4D5E3;">
+    <nav style="max-width:1200px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;">
+      <a href="index.html" style="display:flex;align-items:center;gap:14px;line-height:1;">
+        <img src="images/logo.png" alt="Sweet Secret logo" style="width:74px;height:74px;flex:none;border-radius:50%;object-fit:contain;background:#fff;">
+        <span style="display:flex;flex-direction:column;">
+          <span style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:26px;color:#3A2A30;letter-spacing:0.02em;">Sweet Secret</span>
+          <span style="font-family:'Jost',sans-serif;font-weight:400;font-size:10px;letter-spacing:0.32em;text-transform:uppercase;color:#D06699;margin-top:3px;">Poslastičara · Niš</span>
+        </span>
+      </a>
+      <input type="checkbox" id="navtgl" class="nav-toggle" aria-label="Meni">
+      <label for="navtgl" class="nav-burger" aria-hidden="true"><span></span><span></span><span></span></label>
+      <div class="nav-links" style="display:flex;align-items:center;gap:36px;">
+        <a href="index.html" style="font-size:14px;letter-spacing:0.06em;color:#8A7278;">Početna</a>
+        <a href="meni.html" style="font-size:14px;letter-spacing:0.06em;color:#8A7278;">Meni</a>
+        <a href="torte.html" style="font-size:14px;letter-spacing:0.06em;color:#3A2A30;font-weight:500;">Torte</a>
+        <a href="kolaci.html" style="font-size:14px;letter-spacing:0.06em;color:#8A7278;">Kolači</a>
+        <a href="kontakt.html" style="font-size:13px;letter-spacing:0.04em;color:#fff;background:#E5348C;padding:10px 20px;border-radius:100px;font-weight:500;" style-hover="background:#C4237A;">Poručite tortu</a>
+      </div>
+    </nav>
+  </header>
+
+  <section style="max-width:1200px;margin:0 auto;padding:70px 40px 44px;text-align:center;">
+    <span style="font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:#D06699;">Za svaku priliku</span>
+    <h1 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:62px;line-height:1.05;color:#3A2A30;margin-top:14px;">Torte</h1>
+    <p style="margin:18px auto 0;max-width:540px;font-size:16px;line-height:1.7;color:#7A6068;font-weight:300;">Torte na parče iz vitrine, torte šnit za proslave i dekorisane torte po vašoj želji — svaka ručno napravljena i posebna. Ovo su tek neke od slika naših radova, a mnoge druge možete pronaći na našem <a href="https://www.instagram.com/sweet.secret.nis" target="_blank" rel="noopener noreferrer">Instagramu</a>.</p>
+  </section>
+
+  <!-- GALLERY -->
+  <section style="max-width:1200px;margin:0 auto;padding:20px 40px 40px;display:grid;grid-template-columns:repeat(3,1fr);gap:26px;">
+
+    <div style="background:#fff;border:1px solid #F4D5E3;border-radius:20px;overflow:hidden;">
+      <div data-slider style="position:relative;aspect-ratio:1/1;overflow:hidden;">
+        <div data-strip style="display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;">
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="r18-1" shape="rect" src="images/torta-18-boho.jpg" placeholder="Slika 1"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="r18-2" shape="rect" src="images/torta-18-crno-zlatna.jpg" placeholder="Slika 2"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="r18-3" shape="rect" src="images/torta-18-godine.jpg" placeholder="Slika 3"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="r18-4" shape="rect" src="images/torta-18-roze.jpg" placeholder="Slika 4"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="r18-5" shape="rect" src="images/os18-disco.jpg" placeholder="Slika 5"></image-slot></div>
+        </div>
+        <button onClick="{{ prev }}" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">‹</button>
+        <button onClick="{{ next }}" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">›</button>
+      </div>
+      <div style="padding:22px 24px 26px;">
+        <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#E06BA6;">Dekorisana</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;color:#3A2A30;margin-top:6px;">18. rođendani</h3>
+        <p style="margin-top:6px;font-size:14px;line-height:1.6;color:#8A7278;font-weight:300;">Dizajn po želji, sa temom slavljenika.</p>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #F4D5E3;border-radius:20px;overflow:hidden;">
+      <div data-slider style="position:relative;aspect-ratio:1/1;overflow:hidden;">
+        <div data-strip style="display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;">
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="svadba-1" shape="rect" src="images/svadba-1.jpg" placeholder="Slika 1"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="svadba-2" shape="rect" src="images/svadba-2.jpg" placeholder="Slika 2"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="svadba-3" shape="rect" src="images/svadba-3.jpg" placeholder="Slika 3"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="svadba-4" shape="rect" src="images/svadba-4.jpg" placeholder="Slika 4"></image-slot></div>
+        </div>
+        <button onClick="{{ prev }}" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">‹</button>
+        <button onClick="{{ next }}" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">›</button>
+      </div>
+      <div style="padding:22px 24px 26px;">
+        <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#E06BA6;">Dekorisana</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;color:#3A2A30;margin-top:6px;">Svadbena torta</h3>
+        <p style="margin-top:6px;font-size:14px;line-height:1.6;color:#8A7278;font-weight:300;">Spratovi, cvetni detalji i elegantan dekor.</p>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #F4D5E3;border-radius:20px;overflow:hidden;">
+      <div data-slider style="position:relative;aspect-ratio:1/1;overflow:hidden;">
+        <div data-strip style="display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;">
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-1" shape="rect" src="images/deca-1.jpg" placeholder="Slika 1"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-2" shape="rect" src="images/deca-2.jpg" placeholder="Slika 2"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-3" shape="rect" src="images/deca-3.jpg" placeholder="Slika 3"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-4" shape="rect" src="images/deca-4.jpg" placeholder="Slika 4"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-5" shape="rect" src="images/deca-nika.jpg" placeholder="Slika 5"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-6" shape="rect" src="images/deca-dino.jpg" placeholder="Slika 6"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-7" shape="rect" src="images/deca-auto.jpg" placeholder="Slika 7"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-8" shape="rect" src="images/deca-peda-dino.jpg" placeholder="Slika 8"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-9" shape="rect" src="images/deca-superman.jpg" placeholder="Slika 9"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-10" shape="rect" src="images/deca-vila.jpg" placeholder="Slika 10"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="bitni-11" shape="rect" src="images/deca-brawl.jpg" placeholder="Slika 11"></image-slot></div>
+        </div>
+        <button onClick="{{ prev }}" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">‹</button>
+        <button onClick="{{ next }}" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">›</button>
+      </div>
+      <div style="padding:22px 24px 26px;">
+        <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#E06BA6;">Dekorisana</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;color:#3A2A30;margin-top:6px;">Dečiji rođendani</h3>
+        <p style="margin-top:6px;font-size:14px;line-height:1.6;color:#8A7278;font-weight:300;">Torta sa likom omiljenog junaka i dekor po želji.</p>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #F4D5E3;border-radius:20px;overflow:hidden;">
+      <div data-slider style="position:relative;aspect-ratio:1/1;overflow:hidden;">
+        <div data-strip style="display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;">
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="ferrero-1" shape="rect" src="images/prilike-prsut.jpg" placeholder="Slika 1"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="ferrero-prsut" shape="rect" src="images/bitni-1.jpg" placeholder="Slika"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="ferrero-2" shape="rect" src="images/bitni-2.jpg" placeholder="Slika 2"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="ferrero-3" shape="rect" src="images/bitni-3.jpg" placeholder="Slika 3"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="ferrero-4" shape="rect" src="images/bitni-4.jpg" placeholder="Slika 4"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="ferrero-5" shape="rect" src="images/krstenje-plava.jpg" placeholder="Slika 5"></image-slot></div>
+        </div>
+        <button onClick="{{ prev }}" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">‹</button>
+        <button onClick="{{ next }}" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">›</button>
+      </div>
+      <div style="padding:22px 24px 26px;">
+        <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#E06BA6;">Dekorisana</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;color:#3A2A30;margin-top:6px;">Posebne prilike</h3>
+        <p style="margin-top:6px;font-size:14px;line-height:1.6;color:#8A7278;font-weight:300;">Onda kada želite da iznenadite vaše najbliže.</p>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #F4D5E3;border-radius:20px;overflow:hidden;">
+      <div data-slider style="position:relative;aspect-ratio:1/1;overflow:hidden;">
+        <div data-strip style="display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;">
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="malina-1" shape="rect" src="images/ljubav-1.jpg" placeholder="Slika 1"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="malina-2" shape="rect" src="images/ljubav-2.jpg" placeholder="Slika 2"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="malina-3" shape="rect" src="images/ljubav-3.jpg" placeholder="Slika 3"></image-slot></div>
+        </div>
+        <button onClick="{{ prev }}" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">‹</button>
+        <button onClick="{{ next }}" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">›</button>
+      </div>
+      <div style="padding:22px 24px 26px;">
+        <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#E06BA6;">Dekorisana</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;color:#3A2A30;margin-top:6px;">Praznici ljubavi</h3>
+        <p style="margin-top:6px;font-size:14px;line-height:1.6;color:#8A7278;font-weight:300;">Srca, mašne i slatke poruke — za Dan zaljubljenih, 8. mart i sve drage osobe.</p>
+      </div>
+    </div>
+
+    <div style="background:#fff;border:1px solid #F4D5E3;border-radius:20px;overflow:hidden;">
+      <div data-slider style="position:relative;aspect-ratio:1/1;overflow:hidden;">
+        <div data-strip style="display:flex;height:100%;overflow-x:auto;scroll-snap-type:x mandatory;">
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="mesani-1" shape="rect" src="images/snit-1.jpg" placeholder="Slika 1"></image-slot></div>
+          <div style="min-width:100%;height:100%;scroll-snap-align:start;"><image-slot id="mesani-2" shape="rect" src="images/snit-torta.jpg" placeholder="Slika 2"></image-slot></div>
+        </div>
+        <button onClick="{{ prev }}" style="position:absolute;top:50%;left:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">‹</button>
+        <button onClick="{{ next }}" style="position:absolute;top:50%;right:10px;transform:translateY(-50%);width:34px;height:34px;border:none;border-radius:50%;background:rgba(255,255,255,0.9);color:#C4237A;font-size:20px;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(138,20,60,0.18);">›</button>
+      </div>
+      <div style="padding:22px 24px 26px;">
+        <span style="font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:#E06BA6;">Torta šnit</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:24px;color:#3A2A30;margin-top:6px;">Šnit torte</h3>
+        <p style="margin-top:6px;font-size:14px;line-height:1.6;color:#8A7278;font-weight:300;">Dostupne od 1 kg ili 2 kg, sa jednim od ponuđenih ukusa torti.</p>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- HOW TO ORDER -->
+  <section style="max-width:1000px;margin:0 auto;padding:70px 40px;">
+    <div style="text-align:center;margin-bottom:48px;">
+      <span style="font-size:11px;letter-spacing:0.3em;text-transform:uppercase;color:#D06699;">Kako naručiti</span>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-weight:500;font-size:42px;color:#3A2A30;margin-top:12px;">Do vaše torte u tri koraka</h2>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px;">
+      <div style="text-align:center;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:44px;color:#F0A6C8;font-weight:600;">01</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:22px;color:#3A2A30;margin-top:6px;">Javite se</h3>
+        <p style="margin-top:8px;font-size:14px;line-height:1.7;color:#8A7278;font-weight:300;">Pozovite ili pišite na Instagram sa prilikom i brojem gostiju.</p>
+      </div>
+      <div style="text-align:center;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:44px;color:#F0A6C8;font-weight:600;">02</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:22px;color:#3A2A30;margin-top:6px;">Dogovorimo detalje</h3>
+        <p style="margin-top:8px;font-size:14px;line-height:1.7;color:#8A7278;font-weight:300;">Biramo ukuse, izgled i dobijate tačnu cenu i rok.</p>
+      </div>
+      <div style="text-align:center;">
+        <span style="font-family:'Cormorant Garamond',serif;font-size:44px;color:#F0A6C8;font-weight:600;">03</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:22px;color:#3A2A30;margin-top:6px;">Preuzimanje</h3>
+        <p style="margin-top:8px;font-size:14px;line-height:1.7;color:#8A7278;font-weight:300;">Sveže napravljenu tortu preuzimate u našoj radnji u Nišu.</p>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:44px;">
+      <a href="kontakt.html" style="display:inline-block;font-size:14px;letter-spacing:0.04em;color:#fff;background:#E5348C;padding:15px 34px;border-radius:100px;font-weight:500;" style-hover="background:#C4237A;">Poručite tortu</a>
+    </div>
+  </section>
+
+  <footer style="background:#FDF1F7;border-top:1px solid #F4D5E3;">
+    <div style="max-width:1200px;margin:0 auto;padding:56px 40px 40px;display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:40px;">
+      <div>
+        <span style="font-family:'Cormorant Garamond',serif;font-weight:600;font-size:26px;color:#3A2A30;">Sweet Secret</span>
+        <p style="margin-top:12px;font-size:14px;line-height:1.7;color:#8A7278;font-weight:300;max-width:280px;">Poslastičara u Nišu. Ručno rađene torte i kolači po vašoj želji.</p>
+      </div>
+      <div>
+        <h4 style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#D06699;margin-bottom:16px;">Meni</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <a href="meni.html" style="font-size:14px;color:#7A6068;">Ceo meni</a>
+          <a href="torte.html" style="font-size:14px;color:#7A6068;">Torte</a>
+          <a href="kolaci.html" style="font-size:14px;color:#7A6068;">Kolači</a>
+        </div>
+      </div>
+      <div>
+        <h4 style="font-size:11px;letter-spacing:0.2em;text-transform:uppercase;color:#D06699;margin-bottom:16px;">Kontakt</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <span style="font-size:14px;color:#7A6068;">Park Svetog Save 10, Niš</span>
+          <a href="tel:+38166396500" style="font-size:14px;color:#7A6068;">+381 66 396 500</a>
+          <a href="https://www.instagram.com/sweet.secret.nis" target="_blank" rel="noopener noreferrer" style="font-size:14px;color:#7A6068;">@sweet.secret.nis</a>
+        </div>
+      </div>
+    </div>
+    <div style="max-width:1200px;margin:0 auto;padding:20px 40px;border-top:1px solid #F4D5E3;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+      <span style="font-size:12px;color:#D06699;">© 2026 Sweet Secret · Niš</span>
+      <span style="font-size:12px;color:#D06699;">Ručno rađeno sa ljubavlju</span>
+    </div>
+  </footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  renderVals() {
+    const move = (e, dir) => {
+      const strip = e.currentTarget.parentElement.querySelector('[data-strip]');
+      if (!strip) return;
+      const w = strip.clientWidth;
+      const max = strip.scrollWidth - w;
+      const idx = Math.round(strip.scrollLeft / w);
+      const last = Math.round(max / w);
+      let target;
+      if (dir > 0) target = strip.scrollLeft >= max - 2 ? 0 : (idx + 1) * w;
+      else target = strip.scrollLeft <= 2 ? last * w : (idx - 1) * w;
+      strip.scrollTo({ left: target, behavior: 'smooth' });
+    };
+    return {
+      prev: (e) => move(e, -1),
+      next: (e) => move(e, 1),
+    };
+  }
+}
+</script>
+</body>
+</html>
